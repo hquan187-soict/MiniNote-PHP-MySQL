@@ -7,14 +7,21 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-$notes = [];
+$tu_khoa = $_GET['keyword'] ?? '';
+$id_hientai = $_SESSION['user_id'];
+$ds_notes = [];
+
 try {
-    $stmt = $pdo->prepare("SELECT id, title, content, created_at FROM notes WHERE user_id = ? ORDER BY created_at DESC");
-    $stmt->execute([$_SESSION['user_id']]);
-    $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($tu_khoa != '') {
+        $stmt = $pdo->prepare("SELECT * FROM notes WHERE user_id = ? AND (title LIKE ? OR content LIKE ?) ORDER BY created_at DESC");
+        $stmt->execute([$id_hientai, "%$tu_khoa%", "%$tu_khoa%"]);
+    } else {
+        $stmt = $pdo->prepare("SELECT * FROM notes WHERE user_id = ? ORDER BY created_at DESC");
+        $stmt->execute([$id_hientai]);
+    }
+    $ds_notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    error_log("Lỗi fetch danh sách notes: " . $e->getMessage());
-    $error_msg = "Không thể tải dữ liệu lúc này. Vui lòng thử lại sau.";
+    die("Lỗi kết nối"); 
 }
 ?>
 <!DOCTYPE html>
@@ -28,7 +35,6 @@ try {
         .note-list { list-style-type: none; padding: 0; }
         .note-item { background: #f9f9f9; padding: 15px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #eee;}
         .note-meta { color: #666; font-size: 0.85em; margin: 5px 0 10px 0; }
-        .error-text { color: red; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -40,27 +46,30 @@ try {
     <div class="actions">
         <a href="create.php"><button type="button">+ Tạo ghi chú mới</button></a>
     </div>
+    <form method="GET" action="" style="margin-top:15px;display:flex;gap:10px;">
+        <input type="text" name="keyword" value="<?= htmlspecialchars($tu_khoa) ?>" placeholder="Nhập từ khóa..." style="padding:5px;width:250px;">
+        <button type="submit" style="background:#333;color:#fff;border:none;padding:5px 10px;">Tìm kiếm</button>
+        <a href="index.php" style="padding:5px 10px;background:#ddd;color:black;text-decoration:none;">Tất cả</a>
+    </form>
 
     <h3>Danh sách ghi chú của bạn:</h3>
 
-    <?php if (isset($error_msg)): ?>
-        <p class="error-text"><?= htmlspecialchars($error_msg) ?></p>
-    <?php elseif (!empty($notes)): ?>
+    <?php if (!empty($ds_notes)): ?>
         <ul class="note-list">
-            <?php foreach ($notes as $note): ?>
+            <?php foreach ($ds_notes as $note): ?>
                 <li style="margin-bottom:15px;border-bottom:1px solid #ccc;padding-bottom:10px;">
                     <strong><a href="detail.php?id=<?= $note['id'] ?>" style="text-decoration:none;color:black;font-size:18px;"><?= htmlspecialchars($note['title']) ?></a></strong>
                     <br>
                         <small>Tạo lúc: <?= $note['created_at'] ?></small>
                     <br>
-                        <a href="edit.php?id=<?= $note['id'] ?>" style="margin-right:10px;font-weight:bold;">Sửa</a> 
-                        <a href="delete.php?id=<?= $note['id'] ?>" style="font-weight:bold;" onclick="
+                        <a href="edit.php?id=<?= $note['id'] ?>" style="margin-right:10px;font-weight:bold;color:orange;">Sửa</a> 
+                        <a href="delete.php?id=<?= $note['id'] ?>" style="font-weight:bold;color:red;" onclick="
                             return confirm('Chắc chắn xóa chứ?');">Xóa</a>
                 </li>
             <?php endforeach; ?>
         </ul>
     <?php else: ?>
-        <p>Bạn chưa có ghi chú nào. Hãy tạo mới!</p>
+        <p style="color:red;font-style:italic">Không có ghi chú nào match keyword!</p>
     <?php endif; ?>
 </body>
 </html>

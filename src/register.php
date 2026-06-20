@@ -1,48 +1,46 @@
 <?php
 session_start();
 require 'db.php';
-$error = '';
-$success = '';
+
+$loi_hienthi = '';
+$is_dangky_thanhcong = false;
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = trim($_POST['username']);
     $password = $_POST['password'];
+
     if (!empty($username) && !empty($password)) {
-        // Băm mật khẩu (Bcrypt)
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         try {
             $stmt = $pdo->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
             $stmt->execute([$username, $hashed_password]);
-            $success = "Đăng ký thành công! Hãy đăng nhập.";
+            $is_dangky_thanhcong = true;
         } catch (PDOException $e) {
-            // Lỗi 23000 thường là do trùng khóa UNIQUE (username đã tồn tại)
             if ($e->getCode() == 23000) {
-                $error = "Tên đăng nhập đã tồn tại!";
+                $loi_hienthi = "Tên đăng nhập đã tồn tại!";
             } else {
-                $error = "Có lỗi xảy ra: " . $e->getMessage();
+                die("Lỗi kết nối");
             }
         }
     } else {
-        $error = "Vui lòng nhập đầy đủ thông tin!";
+        $loi_hienthi = "Vui lòng nhập đầy đủ!";
     }
 }
 ?>
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>Đăng ký - Mini Note</title>
-</head>
-<body>
-    <h2>Đăng ký tài khoản</h2>
-    <?php if ($error): ?><p style="color:red;"><?= $error ?></p><?php endif; ?>
-    <?php if ($success): ?><p style="color:green;"><?= $success ?></p><?php endif; ?>
-    <form method="POST" action="">
-        <label>Tên đăng nhập:</label><br>
-        <input type="text" name="username" required><br><br>
-        <label>Mật khẩu:</label><br>
-        <input type="password" name="password" required><br><br>
-        <button type="submit">Đăng ký</button>
-    </form>
-    <p>Đã có tài khoản? <a href="login.php">Đăng nhập</a></p>
+<body style="background:#f4f4f4;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;">
+    <div style="background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);width:300px;text-align:center;">
+        <h2>Tạo tài khoản</h2>
+        <?php if ($loi_hienthi): ?><p style="color:red;font-weight:bold;"><?= $loi_hienthi ?></p><?php endif; ?>
+        <?php if ($is_dangky_thanhcong): ?><p style="color:green;font-weight:bold;">Đăng ký thành công!</p><?php endif; ?>
+        
+        <form method="POST" action="">
+            <input type="text" name="username" placeholder="Tên đăng nhập" required style="width:90%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:4px;"><br>
+            <input type="password" name="password" placeholder="Mật khẩu" required style="width:90%;padding:10px;margin-bottom:15px;border:1px solid #ccc;border-radius:4px;"><br>
+            <button type="submit" style="background:#28a745;color:white;border:none;padding:10px;border-radius:4px;cursor:pointer;width:100%;font-size:16px;">Đăng ký</button>
+        </form>
+        <p style="margin-top:15px;font-size:14px;">Đã có tài khoản <a href="login.php" style="color:#007bff;text-decoration:none;">Đăng nhập</a></p>
+    </div>
 </body>
 </html>
