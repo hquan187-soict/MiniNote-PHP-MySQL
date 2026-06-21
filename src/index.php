@@ -8,15 +8,17 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $tu_khoa = $_GET['keyword'] ?? '';
+$thu_tu = $_GET['sort'] ?? 'desc';
 $id_hientai = $_SESSION['user_id'];
 $ds_notes = [];
+$sql_order = $thu_tu === 'asc' ? 'ASC' : 'DESC';
 
 try {
     if ($tu_khoa != '') {
-        $stmt = $pdo->prepare("SELECT * FROM notes WHERE user_id = ? AND (title LIKE ? OR content LIKE ?) ORDER BY created_at DESC");
+        $stmt = $pdo->prepare("SELECT * FROM notes WHERE user_id = ? AND (title LIKE ? OR content LIKE ?) ORDER BY created_at $sql_order");
         $stmt->execute([$id_hientai, "%$tu_khoa%", "%$tu_khoa%"]);
     } else {
-        $stmt = $pdo->prepare("SELECT * FROM notes WHERE user_id = ? ORDER BY created_at DESC");
+        $stmt = $pdo->prepare("SELECT * FROM notes WHERE user_id = ? ORDER BY created_at $sql_order");
         $stmt->execute([$id_hientai]);
     }
     $ds_notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -46,13 +48,19 @@ try {
     <div class="actions">
         <a href="create.php"><button type="button">+ Tạo ghi chú mới</button></a>
     </div>
-    <form method="GET" action="" style="margin-top:15px;display:flex;gap:10px;">
+    <form method="GET" action="" style="margin-top:15px;display:flex;gap:10px;align-items:center;">
         <input type="text" name="keyword" value="<?= htmlspecialchars($tu_khoa) ?>" placeholder="Nhập từ khóa..." style="padding:5px;width:250px;">
+        
+        <select name="sort" style="padding:5px;height:31px;">
+            <option value="desc" <?= $thu_tu == 'desc' ? 'selected' : '' ?>>Mới nhất</option>
+            <option value="asc" <?= $thu_tu == 'asc' ? 'selected' : '' ?>>Cũ nhất</option>
+        </select>
+
         <button type="submit" style="background:#333;color:#fff;border:none;padding:5px 10px;">Tìm kiếm</button>
         <a href="index.php" style="padding:5px 10px;background:#ddd;color:black;text-decoration:none;">Tất cả</a>
     </form>
 
-    <h3>Danh sách ghi chú của bạn:</h3>
+    <h3>Danh sách ghi chú của bạn (<?= count($ds_notes) ?>):</h3>
 
     <?php if (!empty($ds_notes)): ?>
         <ul class="note-list">
