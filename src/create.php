@@ -9,13 +9,25 @@ $error = '';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title = trim($_POST['title']);
     $content = trim($_POST['content']);
+    $duong_dan_anh = null;
+    if (isset($_FILES['image_upload']) && $_FILES['image_upload']['error'] == 0) {
+        $thu_muc_luu = 'uploads/';
+        if (!file_exists($thu_muc_luu)) {
+            mkdir($thu_muc_luu, 0777, true);
+        }
+        $file_name = time() . '_' . $_FILES['image_upload']['name'];
+        $duong_dan_cuoi = $thu_muc_luu . $file_name;
+        if (move_uploaded_file($_FILES['image_upload']['tmp_name'], $duong_dan_cuoi)) {
+            $duong_dan_anh = $duong_dan_cuoi;
+        }
+    }
 
     if (empty($title)) {
         $error = "Tiêu đề không được để trống!";
     } else {
         try {
-            $stmt = $pdo->prepare("INSERT INTO notes (user_id, title, content) VALUES (?, ?, ?)");
-            $stmt->execute([$_SESSION['user_id'], $title, $content]);
+            $stmt = $pdo->prepare("INSERT INTO notes (user_id, title, content, image_path) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$_SESSION['user_id'], $title, $content, $duong_dan_anh]);
             
             header("Location: index.php");
             exit;
@@ -46,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <p style="color: red; font-weight: bold; text-align:center;"><?= htmlspecialchars($error) ?></p>
         <?php endif; ?>
 
-        <form method="POST" action="">
+        <form method="POST" action="" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="title" style="font-weight:bold;">Tiêu đề:</label><br>
                 <input type="text" name="title" id="title" class="form-control" required>
@@ -55,6 +67,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="form-group">
                 <label for="content" style="font-weight:bold;">Nội dung:</label><br>
                 <textarea name="content" id="content" rows="6" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+                <label style="font-weight:bold;">Đính kèm ảnh:</label><br>
+                <input type="file" name="image_upload" accept="image/*" style="margin-top:5px;">
             </div>
             
             <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">

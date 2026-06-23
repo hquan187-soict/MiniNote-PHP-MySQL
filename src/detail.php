@@ -20,6 +20,11 @@ if(!$thong_tin_note) die("Lỗi: Không tìm thấy ghi chú hoặc không có q
         <small style="color:gray;display:block;margin-bottom:10px;">
             Được tạo vào: <?= $thong_tin_note['created_at'] ?>
         </small>
+        <?php if (!empty($thong_tin_note['image_path'])): ?>
+            <div style="text-align:center; margin-top:10px;">
+                <img src="<?= htmlspecialchars($thong_tin_note['image_path']) ?>" style="max-width:100%; border-radius:4px; border:1px solid #ccc;">
+            </div>
+        <?php endif; ?>
         <p style="white-space:pre-wrap;line-height:1.6;margin-top:15px;background:#f9f9f9;padding:15px;border-radius:4px;border:1px solid #ddd;">
             <?= htmlspecialchars($thong_tin_note['content']) ?>
         </p>
