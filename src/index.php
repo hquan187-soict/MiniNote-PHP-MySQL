@@ -40,9 +40,9 @@ try {
     </style>
 </head>
 <body>
-    <div class="header-container">
-        <h1>Xin chào, <?= htmlspecialchars($_SESSION['username'] ?? 'Bạn') ?>!</h1>
-        <a href="logout.php">Đăng xuất</a>
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ccc; padding-bottom:10px; margin-bottom:20px;">
+        <h1 style="margin:0;">Xin chào, <a href="profile.php" style="color:#007bff; text-decoration:none;"><?= htmlspecialchars($_SESSION['username'] ?? 'Bạn') ?></a>!</h1>
+        <a href="logout.php" style="color:red; font-weight:bold; text-decoration:none;">Đăng xuất</a>
     </div>
 
     <div class="actions">
