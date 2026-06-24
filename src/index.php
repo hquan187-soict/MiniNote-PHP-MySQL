@@ -45,8 +45,9 @@ try {
         <a href="logout.php" style="color:red; font-weight:bold; text-decoration:none;">Đăng xuất</a>
     </div>
 
-    <div class="actions">
-        <a href="create.php"><button type="button">+ Tạo ghi chú mới</button></a>
+    <div class="actions" style="margin-bottom: 20px; display:flex; gap:10px;">
+        <a href="create.php" style="background:#28a745; color:white; padding:8px 15px; text-decoration:none; border-radius:4px; font-weight:bold;">+ Tạo ghi chú mới</a>
+        <a href="delete_all.php" onclick="return confirm('Mất sạch ráng chịu nha. Xóa hết?');" style="background:#dc3545; color:white; padding:8px 15px; text-decoration:none; border-radius:4px; font-weight:bold;">Xóa tất cả</a>
     </div>
     <form method="GET" action="" style="margin-top:15px;display:flex;gap:10px;align-items:center;">
         <input type="text" name="keyword" value="<?= htmlspecialchars($tu_khoa) ?>" placeholder="Nhập từ khóa..." style="padding:5px;width:250px;">

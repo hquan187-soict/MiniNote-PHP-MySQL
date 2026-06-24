@@ -12,7 +12,7 @@ if(!$thong_tin_note) die("Lỗi: Không tìm thấy ghi chú hoặc không có q
 ?>
 <!DOCTYPE html>
 <html lang="vi">
-<body style="font-family: sans-serif; background: #f4f4f4; display:flex; justify-content:center; align-items:center; height:100vh; margin:0;">
+<body style="font-family: sans-serif; background: #f4f4f4; display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; padding: 20px;">
     
     <div style="background:#fff;padding:30px;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.1);width:100%;max-width:500px;">
         <h2 style="text-align:center;margin-top:0;">Chi tiết ghi chú</h2>
@@ -30,9 +30,12 @@ if(!$thong_tin_note) die("Lỗi: Không tìm thấy ghi chú hoặc không có q
         </p>
         
         <br>
-        <div style="text-align:center;margin-top:10px;">
+        <div style="text-align:center;margin-top:10px;display:flex;justify-content:center;gap:10px;">
             <a href="index.php" style="background:#6c757d;color:white;padding:8px 20px;text-decoration:none;border-radius:4px;">
                 Quay về
+            </a>
+            <a href="export.php?id=<?= $thong_tin_note['id'] ?>" style="background:#17a2b8;color:white;padding:8px 20px;text-decoration:none;border-radius:4px;font-weight:bold;">
+                Xuất file TXT
             </a>
         </div>
     </div>
